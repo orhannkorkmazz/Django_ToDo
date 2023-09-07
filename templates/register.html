@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+{% load crispy_forms_tags %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+    
+<h2>Kayıt Ol</h2>
+  <form method="post">
+   
+    {% csrf_token %}
+    {{ form|crispy}}
+     <p class="left-aligned">Hesabınız var mı? <a href="register" style="text-decoration: none">Giriş Yap</a></p>
+     
+    <button type="submit" class="btn btn-danger " >Kayıt Ol</button>
+  </form>
+  
+  </div>
+  
+  </div>
+  
+{% endblock body %}

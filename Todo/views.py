@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate,logout
 from django.contrib import messages
 from django.contrib.auth.models import User
+from .forms import RegisterForm 
 def index (request):
     return render(request,"index.html")
 def login(request):
@@ -17,3 +18,14 @@ def login(request):
 			return redirect('index')
 	form=AuthenticationForm()
 	return render(request,"login.html",{'form':form})
+def register(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('index')
+    form = RegisterForm()
+    return render(request, "register.html", {'form': form})
+
+	
