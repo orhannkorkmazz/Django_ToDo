@@ -3,29 +3,44 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate,logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import RegisterForm 
+from .forms import RegisterForm ,LoginForm
 def index (request):
     return render(request,"index.html")
-def login(request):
-	if request.method == "POST":
-		form = AuthenticationForm(request, data=request.POST) # AuthenticationForm Bu form, kullanıcıların kimlik doğrulama (login) için kullanıcı adı (username) ve şifre (password) girmelerini sağlar.
-		if form.is_valid():
-			username=form.cleaned_data.get('username')
-			password=form.cleaned_data.get('password')
-			user=authenticate(request,username=username,password=password)
-		if user is not None:
-			login(request,user)
-			return redirect('index')
-	form=AuthenticationForm()
-	return render(request,"login.html",{'form':form})
+def loginUser(request):
+    form = LoginForm(request.POST or None)
+    context = {
+        "form":form
+    }
+
+    if form.is_valid():
+        username = form.cleaned_data.get("username")
+        password = form.cleaned_data.get("password")
+        user=authenticate(username=username,password=password)
+        if user is None:
+            messages.info(request,"Böyle bir kullanıcı bulunmuyor ya da şifre yanlış")
+            return render(request,"login.html",context)
+        messages.success(request,"Başarıyla Giriş Yaptınız")
+        login(request,user)
+        return render(request,"index.html")
+    return render(request,"login.html",context)
+def logoutUser(request):
+    logout(request) 
+    return render(request,"index.html")
 def register(request):
-    if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('index')
-    form = RegisterForm()
-    return render(request, "register.html", {'form': form})
+    form = RegisterForm(request.POST or None)
+    if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            newUser = User(username =username)
+            newUser.set_password(password)
+            newUser.save()
+            #login(request,newUser)
+            messages.success(request,"Başarıyla kayıt oldunuz.")
+            return render(request,"login.html",{'form':form})
+    else:
+        context = {
+            "form" : form
+        } 
+    return render(request,"register.html",context)
 
 	

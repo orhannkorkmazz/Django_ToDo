@@ -13,6 +13,28 @@
     <body>
    {% include "includes/navbar.html" %}
    {% load static %}
+   {% if messages %}
+   <div class="messages">
+   {% for message in messages %}
+   {% if message.tags == "info" %}
+   <li class="alert alert-danger">{{ message }}</li> <!--böyle yapmamızın nedeni django da alert mesajı oalrak danger yok onu biz bu şekilde dahil etmiş oluyoruz-->
+   {% else %}
+   <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+   {% endif %}
+ 
+   {% endfor %}
+</div>
+<script>
+    // Mesajları belirli bir süre sonra otomatik olarak kaldır
+    setTimeout(function() {
+        document.querySelectorAll('.messages li').forEach(function(message) {
+            message.style.display = 'none';
+        });
+    }, 2000); // 2000 milisaniye (2 saniye)
+</script>
+{% endif %}
+
+
     {% block body %}
     
     {% endblock body %}
