@@ -3,7 +3,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate,logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .forms import RegisterForm ,LoginForm
+from .forms import RegisterForm ,LoginForm,TodoForm
+from .models import Todo
 def index (request):
     return render(request,"index.html")
 def loginUser(request):
@@ -42,5 +43,24 @@ def register(request):
             "form" : form
         } 
     return render(request,"register.html",context)
+def dashboard(request):
+    todos=Todo.objects.filter(author=request.user)
+    form=TodoForm
+    context={
+        "todos":todos,
+        "form":form
+    }
+    return render(request,"dashboard.html",context)
+def addtodo(request):
+    form=TodoForm(request.POST or None)
+    if form.is_valid():
+        todos=form.save(commit=False)#sadece form.save() yaparak kayıt işlemi gerçekleşebilir fakat bu formdan alınan bilgide yazar bilgisi olduğu için ve biz makalede sadece başlık ve içerik bilgisi istediğimizi için hata ile karşılaşırız 
+        todos.author=request.user
+        todos.save()
+        return redirect("/dashboard/")
+    
+    return render(request,"addtodo.html",{"form":form} )
+
+	
 
 	

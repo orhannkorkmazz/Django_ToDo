@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<style>
+  .gradient-custom {
+    background: radial-gradient(50% 123.47% at 50% 50%, #00ff94 0%, #720059 100%),
+    radial-gradient(100% 164.72% at 100% 100%, #6100ff 0%, #00ff57 100%),
+    linear-gradient(360deg, #0029ff 0%, #8fff00 100%),
+    radial-gradient(100% 148.07% at 0% 0%, #fff500 0%, #51d500 100%);
+    background-blend-mode: screen, color-dodge, overlay, difference, normal;
+  }
+
+  /* Ekle butonunu ortalamak için CSS */
+  .center-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+<link rel="stylesheet" href="styles.css">
+<section class="vh-100 gradient-custom">
+  <div class="row d-flex justify-content-center align-items-center h-100">
+    <div class="card" id="list1" style="border-radius: .75rem; background-color: #f4f6f7;">
+      <div class="card-body p-5">
+
+        <p class="h1 text-center mt-3 mb-4 pb-3 text-primary">
+          <i class="fas fa-check-square me-1"></i>
+          <u>My Todo's</u>
+        </p>
+        <div class="pb-2">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              {% if todos %}
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Başlık</th>
+                    <th scope="col">Yazar</th>
+                    <th scope="col">Tarih</th>
+                    <th scope="col">Güncelle</a></th>
+                    <th scope="col">Sil</a></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for todo in todos  %}
+                  <tr>
+                    <td>{{todo.title}}</td>
+                    <td>{{todo.author.username}}</td>
+                    <td>{{todo.created_date}}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+              <div class="alert alert-danger text-center">Henüz To-do Bulunmuyor</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Ekle butonunu ortalamak için div -->
+        <div class="center-button">
+          <a type="submit" class="btn btn-danger" href="/addtodo">To-Do Ekle</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock body %}
+
+  
+<!--
+
+
+           
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end align-items-center mb-4 pt-2 pb-3">
+              <p class="small mb-0 me-2 text-muted">Filtrele</p>
+              <select class="select">
+                <option value="1">Hepsi</option>
+                <option value="2">Yapılanlar</option>
+                <option value="3">Yapılmayanlar</option>
+                <option value="4">Henüz tarihi geçmemişler</option>
+              </select>
+              <p class="small mb-0 ms-4 me-2 text-muted">Sırala</p>
+              <select class="select">
+                <option value="1">Eklenme Tarihine göre</option>
+                <option value="2">bitiş tarihine göre</option>
+              </select>
+            </div>
+
+-->
+   
+    
+
+
+                
+               <!--<a href="#!" style="color:  #f4f6f7;" data-mdb-toggle="tooltip" title="Ascending"><i
+                    class="fas fa-sort-amount-down-alt ms-2"></i></a>
+              </div>
+  
+              <ul class="list-group list-group-horizontal rounded-0 bg-transparent">
+                <li
+                  class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
+                  <div class="form-check">
+                    <input class="form-check-input me-0" type="checkbox" value="" id="flexCheckChecked1"
+                      aria-label="..." checked />
+                  </div>
+                </li>
+                <li
+                  class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
+                  <p class="lead fw-normal mb-0">Buy groceries for next week</p>
+                </li>
+                <li class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
+                  <div class="d-flex flex-row justify-content-end mb-1">
+                    <a href="#!" class="text-info" data-mdb-toggle="tooltip" title="Edit todo"><i
+                        class="fas fa-pencil-alt me-3"></i></a>
+                    <a href="#!" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo"><i
+                        class="fas fa-trash-alt"></i></a>
+                  </div>
+                  <div class="text-end text-muted">
+                    <a href="#!" class="text-muted" data-mdb-toggle="tooltip" title="Created date">
+                      <p class="small mb-0"><i class="fas fa-info-circle me-2"></i>28th Jun 2020</p>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+              <ul class="list-group list-group-horizontal rounded-0">
+                <li
+                  class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
+                  <div class="form-check">
+                    <input class="form-check-input me-0" type="checkbox" value="" id="flexCheckChecked2"
+                      aria-label="..." />
+                  </div>
+                </li>
+                <li
+                  class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
+                  <p class="lead fw-normal mb-0">Renew car insurance</p>
+                </li>
+                <li class="list-group-item px-3 py-1 d-flex align-items-center border-0 bg-transparent">
+                  <div
+                    class="py-2 px-3 me-2 border border-warning rounded-3 d-flex align-items-center bg-light">
+                    <p class="small mb-0">
+                      <a href="#!" data-mdb-toggle="tooltip" title="Due on date">
+                        <i class="fas fa-hourglass-half me-2 text-warning"></i>
+                      </a>
+                      28th Jun 2020
+                    </p>
+                  </div>
+                </li>
+                <li class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
+                  <div class="d-flex flex-row justify-content-end mb-1">
+                    <a href="#!" class="text-info" data-mdb-toggle="tooltip" title="Edit todo"><i
+                        class="fas fa-pencil-alt me-3"></i></a>
+                    <a href="#!" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo"><i
+                        class="fas fa-trash-alt"></i></a>
+                  </div>
+                  <div class="text-end text-muted">
+                    <a href="#!" class="text-muted" data-mdb-toggle="tooltip" title="Created date">
+                      <p class="small mb-0"><i class="fas fa-info-circle me-2"></i>28th Jun 2020</p>
+                    </a>
+                  </div>
+                </li>
+              </ul>
+              
+            -->     
+
