@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate,logout
 from django.contrib import messages
@@ -37,7 +37,7 @@ def register(request):
             newUser.save()
             #login(request,newUser)
             messages.success(request,"Başarıyla kayıt oldunuz.")
-            return render(request,"login.html",{'form':form})
+            return redirect("/login/")
     else:
         context = {
             "form" : form
@@ -60,6 +60,28 @@ def addtodo(request):
         return redirect("/dashboard/")
     
     return render(request,"addtodo.html",{"form":form} )
+def deletetodo(request,id):
+    todo = get_object_or_404(Todo, id= id)
+    todo.delete()
+    return redirect('/dashboard/')
+from django.shortcuts import redirect, get_object_or_404
+from .models import Todo
+
+def completed(request, id):
+    # Görevi veritabanından al veya 404 hatası göster
+    todo = get_object_or_404(Todo, id=id)
+    
+    # Görevin tamamlanma durumunu tersine çevir
+    todo.completed = not todo.completed
+    
+    # Değişikliği kaydet
+    todo.save()
+    
+    # ToDo listesine geri dön
+    return redirect('/dashboard/')  # veya 'dashboard' adlı bir URL'nizi kullanabilirsiniz
+
+
+
 
 	
 

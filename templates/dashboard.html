@@ -17,91 +17,103 @@
     align-items: center;
     height: 100%;
   }
+  .completed-task {
+    text-decoration: line-through; /* Çizgi çizme stili */
+    color: green; /* Tamamlanan görevin rengi */
+  }
+  
 </style>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <link rel="stylesheet" href="styles.css">
 <section class="vh-100 gradient-custom">
   <div class="row d-flex justify-content-center align-items-center h-100">
     <div class="card" id="list1" style="border-radius: .75rem; background-color: #f4f6f7;">
       <div class="card-body p-5">
-
         <p class="h1 text-center mt-3 mb-4 pb-3 text-primary">
           <i class="fas fa-check-square me-1"></i>
           <u>My Todo's</u>
         </p>
-        <div class="pb-2">
-          <div class="card-body">
-            <div class="d-flex flex-row align-items-center">
-              {% if todos %}
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Başlık</th>
-                    <th scope="col">Yazar</th>
-                    <th scope="col">Tarih</th>
-                    <th scope="col">Güncelle</a></th>
-                    <th scope="col">Sil</a></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for todo in todos  %}
-                  <tr>
-                    <td>{{todo.title}}</td>
-                    <td>{{todo.author.username}}</td>
-                    <td>{{todo.created_date}}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-              {% else %}
-              <div class="alert alert-danger text-center">Henüz To-do Bulunmuyor</div>
-              {% endif %}
-            </div>
+        
+        
+        
+        <!-- Tablo -->
+        {% if todos %}
+        <!-- Filtrele ve Sırala Alanları -->
+        <div class="d-flex justify-content-between align-items-center mb-4 pt-2 pb-3">
+          <div>
+            <p class="medium mb-0 me-2 text-muted">Filtrele</p>
+            <select class="select">
+              <option value="1">Hepsi</option>
+              <option value="2">Yapılanlar</option>
+              <option value="3">Yapılmayanlar</option>
+              <option value="4">Henüz tarihi geçmemişler</option>
+            </select>
+          </div>
+          <div>
+            <p class="medium mb-0 ms-4 me-2 text-muted">Sırala</p>
+            <select class="select">
+              <option value="1">Eklenme Tarihine göre</option>
+              <option value="2">Bitiş tarihine göre</option>
+            </select>
           </div>
         </div>
-
+        
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Başlık</th>
+              <th scope="col">Oluşturulma Tarihi</th>
+              <th scope="col">Güncelle</a></th>
+              <th scope="col">Sil</a></th>
+            </tr>
+          </thead>
+          
+          <tbody>
+            {% for todo in todos  %}
+            <tr>
+              
+              <td>
+                <input class="form-check-input me-0" type="checkbox" value="" id="flexCheckChecked1"
+                aria-label="..." onclick="window.location.href='/completed/{{ todo.id }}/'" {% if todo.completed %}checked{% endif %}/>
+   
+                <span class="{% if todo.completed %}completed-task{% endif %}">{{todo.title}}</span>
+              </td>
+              <td>{{todo.created_date}}</td>
+              <td>
+                <div class="text-center">
+                  <a href="/editTodo" class="text-info" data-mdb-toggle="tooltip" title="Edit todo">
+                    <i class="fas fa-pencil-alt me-3"></i>
+                  </a>
+                </div>
+              </td>
+              <td>
+                <div class="text-center">
+                  <a href="/deleteTodo/{{todo.id}}" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo">
+                    <i class="fas fa-trash-alt"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            
+            {% endfor %}
+            
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-danger text-center">Henüz To-do List Bulunmuyor</div>
+        {% endif %}
+        
         <!-- Ekle butonunu ortalamak için div -->
         <div class="center-button">
           <a type="submit" class="btn btn-danger" href="/addtodo">To-Do Ekle</a>
         </div>
-
       </div>
     </div>
   </div>
 </section>
-{% endblock body %}
-
-  
-<!--
-
-
-           
-
-            <hr class="my-4">
-
-            <div class="d-flex justify-content-end align-items-center mb-4 pt-2 pb-3">
-              <p class="small mb-0 me-2 text-muted">Filtrele</p>
-              <select class="select">
-                <option value="1">Hepsi</option>
-                <option value="2">Yapılanlar</option>
-                <option value="3">Yapılmayanlar</option>
-                <option value="4">Henüz tarihi geçmemişler</option>
-              </select>
-              <p class="small mb-0 ms-4 me-2 text-muted">Sırala</p>
-              <select class="select">
-                <option value="1">Eklenme Tarihine göre</option>
-                <option value="2">bitiş tarihine göre</option>
-              </select>
-            </div>
-
--->
-   
-    
-
-
-                
+{% endblock body %}          
                <!--<a href="#!" style="color:  #f4f6f7;" data-mdb-toggle="tooltip" title="Ascending"><i
                     class="fas fa-sort-amount-down-alt ms-2"></i></a>
               </div>
