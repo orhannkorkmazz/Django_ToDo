@@ -5,6 +5,10 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .forms import RegisterForm ,LoginForm,TodoForm
 from .models import Todo
+from django.utils import timezone
+from datetime import datetime, timedelta
+from datetime import date
+from django.contrib.auth.decorators import login_required
 def index (request):
     return render(request,"index.html")
 def loginUser(request):
@@ -43,14 +47,41 @@ def register(request):
             "form" : form
         } 
     return render(request,"register.html",context)
+@login_required
 def dashboard(request):
-    todos=Todo.objects.filter(author=request.user)
-    form=TodoForm
-    context={
-        "todos":todos,
-        "form":form
-    }
-    return render(request,"dashboard.html",context)
+   from datetime import datetime, timedelta
+
+@login_required
+def dashboard(request):
+    filter_option = request.GET.get('filter', 'all')
+    sort_option = request.GET.get('sort', 'created_date')
+
+    todos = Todo.objects.filter(author=request.user)
+
+    # Tarih sınırını hesaplayın: Bugünün sonu (23:59:59)
+    today_end = datetime.combine(date.today(), datetime.min.time()) + timedelta(days=1) - timedelta(seconds=1)
+
+    # Todo listesini filtreleme işlemi
+    if filter_option == 'completed':
+        todos = todos.filter(completed=True)
+    elif filter_option == 'incomplete':
+        todos = todos.filter(completed=False)
+    elif filter_option == 'upcoming':
+        todos = todos.filter(due_date__lte=today_end)
+
+    # Sıralama işlemi
+    if sort_option == 'created_date':
+        todos = todos.order_by('created_date')
+    elif sort_option == 'due_date':
+        todos = todos.order_by('due_date')
+    no_todos_message = None
+
+    if not todos.exists():
+        no_todos_message = "Seçilen öğe ile ilgili gösterilecek bilgi yok"
+    today = date.today()
+    return render(request, 'dashboard.html', {'todos': todos, 'filter_option': filter_option, 'sort_option': sort_option, "today": today, "no_todos_message": no_todos_message})
+
+@login_required
 def addtodo(request):
     form=TodoForm(request.POST or None)
     if form.is_valid():
@@ -58,15 +89,12 @@ def addtodo(request):
         todos.author=request.user
         todos.save()
         return redirect("/dashboard/")
-    
     return render(request,"addtodo.html",{"form":form} )
+@login_required
 def deletetodo(request,id):
     todo = get_object_or_404(Todo, id= id)
     todo.delete()
     return redirect('/dashboard/')
-from django.shortcuts import redirect, get_object_or_404
-from .models import Todo
-
 def completed(request, id):
     # Görevi veritabanından al veya 404 hatası göster
     todo = get_object_or_404(Todo, id=id)
@@ -79,6 +107,21 @@ def completed(request, id):
     
     # ToDo listesine geri dön
     return redirect('/dashboard/')  # veya 'dashboard' adlı bir URL'nizi kullanabilirsiniz
+
+
+@login_required
+def editTodo(request,id):
+    todo = get_object_or_404(Todo, id=id)
+    if request.method == 'POST':
+        form = TodoForm(request.POST, instance=todo)
+        if form.is_valid():
+            form.save()
+            return redirect('/dashboard/')  # Güncellendikten sonra listeye geri dön
+    else:
+        form = TodoForm(instance=todo)
+    
+    return render(request, 'editTodo.html', {'form': form, 'todo': todo})
+
 
 
 

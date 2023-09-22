@@ -1,5 +1,6 @@
 from django import forms
 from .models import Todo
+
 class RegisterForm(forms.Form):
     username=forms.CharField(max_length=50,label="Kullanıcı Adı")
     password=forms.CharField(max_length=50,label="Parola",widget=forms.PasswordInput)
@@ -10,4 +11,4 @@ class LoginForm(forms.Form):
 class TodoForm(forms.ModelForm):
     class Meta:
         model = Todo
-        fields = ['title']
+        fields = ['title','due_date']

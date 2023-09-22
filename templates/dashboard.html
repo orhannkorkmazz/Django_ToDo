@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% load crispy_forms_tags %}
 
 <style>
   .gradient-custom {
@@ -23,6 +24,23 @@
   }
   
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#filter_option").on("change", function() {
+            var filter_option = $(this).val(); // Seçilen filtre seçeneği
+            window.location.href = "/dashboard?filter=" + filter_option;
+        });
+    });
+    $(document).ready(function() {
+      $("#sort_option").on("change", function() {
+          var sort_option = $(this).val(); // Seçilen sıralama seçeneği
+          window.location.href = "/dashboard/?sort=" + sort_option; // Sıralama seçeneğini URL'ye ekle
+      });
+  });
+  
+</script>
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -41,22 +59,30 @@
         <!-- Tablo -->
         {% if todos %}
         <!-- Filtrele ve Sırala Alanları -->
+        
+ 
+
+
+
         <div class="d-flex justify-content-between align-items-center mb-4 pt-2 pb-3">
           <div>
             <p class="medium mb-0 me-2 text-muted">Filtrele</p>
-            <select class="select">
-              <option value="1">Hepsi</option>
-              <option value="2">Yapılanlar</option>
-              <option value="3">Yapılmayanlar</option>
-              <option value="4">Henüz tarihi geçmemişler</option>
+            <form>
+              <select id="filter_option">
+                <option value="all" {% if filter_option == 'all' %}selected{% endif %}>Hepsi</option>
+                <option value="completed" {% if filter_option == 'completed' %}selected{% endif %}>Yapılanlar</option>
+                <option value="incomplete" {% if filter_option == 'incomplete' %}selected{% endif %}>Yapılmayanlar</option>
+                <option value="upcoming" {% if filter_option == 'upcoming' %}selected{% endif %}>Henüz tarihi geçmemişler</option>
             </select>
+            
+          </form>
           </div>
           <div>
             <p class="medium mb-0 ms-4 me-2 text-muted">Sırala</p>
-            <select class="select">
-              <option value="1">Eklenme Tarihine göre</option>
-              <option value="2">Bitiş tarihine göre</option>
-            </select>
+            <select id="sort_option">
+              <option value="created_date" {% if sort_option == 'created_date' %}selected{% endif %}>Eklenme Tarihine göre</option>
+              <option value="due_date"{% if sort_option == 'due_date' %}selected{% endif %}>Bitiş Tarihine göre</option>
+          </select>
           </div>
         </div>
         
@@ -65,11 +91,12 @@
             <tr>
               <th scope="col">Başlık</th>
               <th scope="col">Oluşturulma Tarihi</th>
+              <th scope="col">Bitiş Tarihi</th>
               <th scope="col">Güncelle</a></th>
               <th scope="col">Sil</a></th>
             </tr>
           </thead>
-          
+       
           <tbody>
             {% for todo in todos  %}
             <tr>
@@ -81,13 +108,21 @@
                 <span class="{% if todo.completed %}completed-task{% endif %}">{{todo.title}}</span>
               </td>
               <td>{{todo.created_date}}</td>
+              <td class="{% if todo.due_date < today %}text-danger{% endif %}">
+                {{ todo.due_date|date:"d/m/Y" }}
+            </td>
+            
               <td>
-                <div class="text-center">
-                  <a href="/editTodo" class="text-info" data-mdb-toggle="tooltip" title="Edit todo">
+                
+                  <div class="text-center">
+               
+                  <a href="/editTodo/{{todo.id}}" class="text-info" data-mdb-toggle="tooltip" title="Edit todo">
                     <i class="fas fa-pencil-alt me-3"></i>
                   </a>
                 </div>
+               
               </td>
+            
               <td>
                 <div class="text-center">
                   <a href="/deleteTodo/{{todo.id}}" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo">
@@ -101,8 +136,42 @@
             
           </tbody>
         </table>
+        
         {% else %}
-        <div class="alert alert-danger text-center">Henüz To-do List Bulunmuyor</div>
+        <div class="d-flex justify-content-between align-items-center mb-4 pt-2 pb-3">
+          <div>
+            <p class="medium mb-0 me-2 text-muted">Filtrele</p>
+            <form>
+              <select id="filter_option">
+                <option value="all" {% if filter_option == 'all' %}selected{% endif %}>Hepsi</option>
+                <option value="completed" {% if filter_option == 'completed' %}selected{% endif %}>Yapılanlar</option>
+                <option value="incomplete" {% if filter_option == 'incomplete' %}selected{% endif %}>Yapılmayanlar</option>
+                <option value="upcoming" {% if filter_option == 'upcoming' %}selected{% endif %}>Henüz tarihi geçmemişler</option>
+            </select>
+            
+          </form>
+          </div>
+          <div>
+            <p class="medium mb-0 ms-4 me-2 text-muted">Sırala</p>
+            <select id="sort_option">
+              <option value="created_date" {% if sort_option == 'created_date' %}selected{% endif %}>Eklenme Tarihine göre</option>
+              <option value="due_date"{% if sort_option == 'due_date' %}selected{% endif %}>Bitiş Tarihine göre</option>
+          </select>
+          </div>
+        </div>
+        
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Başlık</th>
+              <th scope="col">Oluşturulma Tarihi</th>
+              <th scope="col">Bitiş Tarihi</th>
+              <th scope="col">Güncelle</a></th>
+              <th scope="col">Sil</a></th>
+            </tr>
+          </thead>
+        </table>
+        <div class="alert alert-danger text-center">To-do List Bulunmuyor</div>
         {% endif %}
         
         <!-- Ekle butonunu ortalamak için div -->
@@ -114,73 +183,4 @@
   </div>
 </section>
 {% endblock body %}          
-               <!--<a href="#!" style="color:  #f4f6f7;" data-mdb-toggle="tooltip" title="Ascending"><i
-                    class="fas fa-sort-amount-down-alt ms-2"></i></a>
-              </div>
-  
-              <ul class="list-group list-group-horizontal rounded-0 bg-transparent">
-                <li
-                  class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
-                  <div class="form-check">
-                    <input class="form-check-input me-0" type="checkbox" value="" id="flexCheckChecked1"
-                      aria-label="..." checked />
-                  </div>
-                </li>
-                <li
-                  class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
-                  <p class="lead fw-normal mb-0">Buy groceries for next week</p>
-                </li>
-                <li class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
-                  <div class="d-flex flex-row justify-content-end mb-1">
-                    <a href="#!" class="text-info" data-mdb-toggle="tooltip" title="Edit todo"><i
-                        class="fas fa-pencil-alt me-3"></i></a>
-                    <a href="#!" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo"><i
-                        class="fas fa-trash-alt"></i></a>
-                  </div>
-                  <div class="text-end text-muted">
-                    <a href="#!" class="text-muted" data-mdb-toggle="tooltip" title="Created date">
-                      <p class="small mb-0"><i class="fas fa-info-circle me-2"></i>28th Jun 2020</p>
-                    </a>
-                  </div>
-                </li>
-              </ul>
-              <ul class="list-group list-group-horizontal rounded-0">
-                <li
-                  class="list-group-item d-flex align-items-center ps-0 pe-3 py-1 rounded-0 border-0 bg-transparent">
-                  <div class="form-check">
-                    <input class="form-check-input me-0" type="checkbox" value="" id="flexCheckChecked2"
-                      aria-label="..." />
-                  </div>
-                </li>
-                <li
-                  class="list-group-item px-3 py-1 d-flex align-items-center flex-grow-1 border-0 bg-transparent">
-                  <p class="lead fw-normal mb-0">Renew car insurance</p>
-                </li>
-                <li class="list-group-item px-3 py-1 d-flex align-items-center border-0 bg-transparent">
-                  <div
-                    class="py-2 px-3 me-2 border border-warning rounded-3 d-flex align-items-center bg-light">
-                    <p class="small mb-0">
-                      <a href="#!" data-mdb-toggle="tooltip" title="Due on date">
-                        <i class="fas fa-hourglass-half me-2 text-warning"></i>
-                      </a>
-                      28th Jun 2020
-                    </p>
-                  </div>
-                </li>
-                <li class="list-group-item ps-3 pe-0 py-1 rounded-0 border-0 bg-transparent">
-                  <div class="d-flex flex-row justify-content-end mb-1">
-                    <a href="#!" class="text-info" data-mdb-toggle="tooltip" title="Edit todo"><i
-                        class="fas fa-pencil-alt me-3"></i></a>
-                    <a href="#!" class="text-danger" data-mdb-toggle="tooltip" title="Delete todo"><i
-                        class="fas fa-trash-alt"></i></a>
-                  </div>
-                  <div class="text-end text-muted">
-                    <a href="#!" class="text-muted" data-mdb-toggle="tooltip" title="Created date">
-                      <p class="small mb-0"><i class="fas fa-info-circle me-2"></i>28th Jun 2020</p>
-                    </a>
-                  </div>
-                </li>
-              </ul>
-              
-            -->     
-
+            

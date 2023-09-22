@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Todo',
     'crispy_forms',#formumuzu direkt alıp yansıtmak yerine kurduğumuz crispy'ı bu ard arda olan kodlarla sisteme tanıttık
     'crispy_bootstrap4',
+    
 ]
 STATIC_URL = '/static/'
 
