@@ -32,24 +32,21 @@ def logoutUser(request):
     logout(request) 
     return render(request,"index.html")
 def register(request):
-    form = RegisterForm(request.POST or None)
-    if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            newUser = User(username =username)
-            newUser.set_password(password)
-            newUser.save()
-            #login(request,newUser)
-            messages.success(request,"Başarıyla kayıt oldunuz.")
-            return redirect("/login/")
+    if request.method=="POST":
+        form = RegisterForm(request.POST or None)
+        if form.is_valid():
+                username = form.cleaned_data.get("username")
+                password = form.cleaned_data.get("password")
+                newUser = User(username =username)
+                newUser.set_password(password)
+                newUser.save()
+                #login(request,newUser)
+                messages.success(request,"Başarıyla kayıt oldunuz.")
+                return redirect("/login/")
     else:
-        context = {
-            "form" : form
-        } 
-    return render(request,"register.html",context)
-@login_required
-def dashboard(request):
-   from datetime import datetime, timedelta
+        form=RegisterForm()
+    return render(request,"register.html",{"form":form})
+
 
 @login_required
 def dashboard(request):
@@ -58,16 +55,15 @@ def dashboard(request):
 
     todos = Todo.objects.filter(author=request.user)
 
-    # Tarih sınırını hesaplayın: Bugünün sonu (23:59:59)
+   # Tarih sınırını hesaplayın: Bugünün sonu (23:59:59)
     today_end = datetime.combine(date.today(), datetime.min.time()) + timedelta(days=1) - timedelta(seconds=1)
-
     # Todo listesini filtreleme işlemi
     if filter_option == 'completed':
         todos = todos.filter(completed=True)
     elif filter_option == 'incomplete':
         todos = todos.filter(completed=False)
     elif filter_option == 'upcoming':
-        todos = todos.filter(due_date__lte=today_end)
+        todos = todos.filter(due_date__gte=today_end )
 
     # Sıralama işlemi
     if sort_option == 'created_date':
